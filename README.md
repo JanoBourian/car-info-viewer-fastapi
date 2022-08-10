@@ -98,7 +98,9 @@ CREATE DATABASE name;
 
 ```bash
 - app/
-    - routers
+    - routers/
+        - cars.py
+        - products.py
     - main.py
 - config/
     - .env.local
