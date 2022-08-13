@@ -236,6 +236,19 @@ if __name__ == "__main__":
 
 ```
 
+And the other main file:
+
+```python
+@app.on_event("startup")
+async def startup():
+    await database.connect()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
+```
+
 <div id="section8"> </div>
 
 # Alembic configuration
