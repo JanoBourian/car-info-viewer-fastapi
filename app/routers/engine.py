@@ -7,6 +7,8 @@ router = APIRouter(tags = ["engine"], prefix = "/engine")
 @router.get("/")
 async def get_all_engines():
     data = await get_all_items()
+    if not data:
+        raise HTTPException(status_code = 404, detail = f"The id {id} was not found")
     return data
 
 @router.get("/{id}", response_model = Engine)
