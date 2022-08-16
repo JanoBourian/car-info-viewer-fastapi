@@ -5,6 +5,7 @@ databases
 email-validator
 environs
 fastapi
+httpx
 passlib[bcrypt]
 psycopg2-binary
 pydantic
@@ -12,4 +13,5 @@ pyjwt
 pytest
 requests
 sqlalchemy
+trio
 uvicorn
