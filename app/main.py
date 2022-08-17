@@ -4,6 +4,7 @@ from connection.databases import database
 
 app = FastAPI()
 
+
 @app.on_event("startup")
 async def startup():
     await database.connect()
@@ -13,8 +14,10 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
+
 @app.get("/")
 async def index():
     return {"message": "nothing"}
+
 
 app.include_router(engine.router)
