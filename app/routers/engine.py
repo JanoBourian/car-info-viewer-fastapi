@@ -44,8 +44,7 @@ async def update_items(id: int, request: EngineIn):
     item = await get_item(id)
     if not item:
         raise HTTPException(status_code=404, detail=f"Item {request.name} not exists")
-    updated_item = await update_item(id, request)
-    return updated_item
+    return await update_item(id, request)
 
 
 @router.delete("/{id}")

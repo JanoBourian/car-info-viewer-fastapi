@@ -1,4 +1,3 @@
-from fastapi import Request, HTTPException
 from connection.models import Engine
 from connection.databases import database
 from schemas.engine import EngineIn, EngineOut
@@ -25,8 +24,7 @@ async def get_item_by_name(name: str):
 async def add_item(data: EngineIn):
     query = Engine.insert().values(**data.dict())
     id_ = await database.execute(query)
-    created_value = await get_item(id_)
-    return created_value
+    return await get_item(id_)
 
 
 ## Update one item
