@@ -19,23 +19,23 @@ async def test_root():
 async def test_get_all_items_empty():
     # async with AsyncClient(app=app, base_url="http://localhost:8000/") as ac:
     async with httpx.AsyncClient() as ac:
-        response = await ac.get("http://localhost:8000/engine/")
+        response = await ac.get("http://localhost:8000/sold/")
     assert response.status_code == 200
     assert json.loads(response.content) == {"detail": "Nothing item was found"}
 
 @pytest.mark.anyio
 async def test_create_item():
     data = {
-            "name": "marcus"
+            "name": "marshall"
         }
     async with httpx.AsyncClient() as ac:
-        response = await ac.post("http://localhost:8000/engine/", json = data)
+        response = await ac.post("http://localhost:8000/sold/", json = data)
     # assert response.status_code == 200
-    assert json.loads(response.content) == {"id": 16, "name": "marcus"}
+    assert json.loads(response.content) == {"id": 1, "name": "marshall"}
 
 @pytest.mark.anyio
 async def test_delete_item():
     async with httpx.AsyncClient() as ac:
-        response = await ac.delete("http://localhost:8000/engine/16")
+        response = await ac.delete("http://localhost:8000/sold/1")
     # assert response.status_code == 200
-    assert json.loads(response.content) == {"message": "Item 16 was deleted"}
+    assert json.loads(response.content) == {"message": "Item 1 was deleted"}

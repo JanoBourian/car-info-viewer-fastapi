@@ -40,11 +40,11 @@ async def update_items(id:int, request: MakerIn):
 
 ## DELETE
 @router.delete("/{id}")
-async def delete_item(id:int):
+async def delete_item_endpoint(id:int):
     data = await get_item_by_id(id)
     if not data:
         raise HTTPException(status_code=404, detail=f"Item {id} not exists")
-    await delete_item(data)
+    await delete_item(id)
     item = await get_item_by_id(id)
     if item:
         raise HTTPException(status_code=404, detail=f"Item {id} was not deleted")

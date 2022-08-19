@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import engine, maker
+from app.routers import engine, maker, sold
 from connection.databases import database
 
 app = FastAPI()
@@ -22,3 +22,4 @@ async def index():
 
 app.include_router(engine.router)
 app.include_router(maker.router)
+app.include_router(sold.router)
