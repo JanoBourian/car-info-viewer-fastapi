@@ -8,13 +8,15 @@ from app.cruds.sold import (
     delete_item,
 )
 from schemas.sold import SoldOut, SoldIn
+from app.cruds.CrudOperations import Operations
+from connection.models import Sold
 
 router = APIRouter(tags=["sold"], prefix="/sold")
-
+crud = Operations(Sold)
 
 @router.get("/")
 async def get_all_solds():
-    data = await get_all_items()
+    data = await crud.get_all_items()
     if not data:
         raise HTTPException(status_code=404, detail=f"Nothing item was found")
     return data

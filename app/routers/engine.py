@@ -7,14 +7,16 @@ from app.cruds.engine import (
     update_item,
     delete_item,
 )
+from app.cruds.CrudOperations import Operations
 from schemas.engine import EngineOut, EngineIn
+from connection.models import Engine
 
 router = APIRouter(tags=["engineOut"], prefix="/engine")
-
+crud = Operations(Engine)
 
 @router.get("/")
 async def get_all_engines():
-    data = await get_all_items()
+    data = await crud.get_all_items()
     if not data:
         raise HTTPException(status_code=404, detail=f"Nothing item was found")
     return data

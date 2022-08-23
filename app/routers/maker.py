@@ -1,13 +1,15 @@
 from fastapi import APIRouter, HTTPException
 from app.cruds.maker import get_all_items, get_item_by_id, get_item_by_name, add_item, update_item, delete_item
 from schemas.maker import MakerOut, MakerIn
+from app.cruds.CrudOperations import Operations
+from connection.models import Maker
 
 router = APIRouter(tags=["makers"], prefix="/maker")
-
+crud = Operations(Maker)
 
 @router.get("/")
 async def get_all():
-    data = await get_all_items()
+    data = await crud.get_all_items()
     if not data:
         raise HTTPException(status_code=404, detail="Nothing item was found")
     return data
