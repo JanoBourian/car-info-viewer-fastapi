@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Any
 from databases.interfaces import Record
 from sqlalchemy import Table
 from app.cruds.CrudBuilder import Crud
@@ -14,7 +14,7 @@ class Operations(Crud):
         query = self.model.select()
         return await database.fetch_all(query)
 
-    async def get_item_by_pk(self, pk: int) -> Optional[Record]:
+    async def get_item_by_pk(self, pk: Any) -> Optional[Record]:
         id_ = self._get_pk()
         query = self.model.select().where(self.model.c[id_] == pk)
         return await database.fetch_one(query)
@@ -39,6 +39,18 @@ class Operations(Crud):
         query = self.model.insert().values(values)
         id_ = await database.execute(query)
         return await self.get_item_by_pk(id_)
+
+    async def update_item(self, pk: Any, values: dict) -> Optional[Record]:
+        id_ = self._get_pk()
+        query = self.model.update().where(self.model.c[id_] == pk).values(values)
+        await database.execute(query)
+        return await self.get_item_by_pk(pk)
+
+    async def delete_item(self, pk: Any) -> Optional[Record]:
+        id_ = self._get_pk()
+        query = self.model.delete().where(self.model.c[id_] == pk)
+        await database.execute(query)
+        return await self.get_item_by_pk(pk)
 
     def _get_pk(self) -> str:
         for column in self.model.columns:

@@ -1,9 +1,4 @@
 from fastapi import APIRouter, HTTPException, Request
-from app.cruds.engine import (
-    get_item,
-    update_item,
-    delete_item,
-)
 from app.cruds.CrudOperations import Operations
 from schemas.engine import EngineOut, EngineIn, EngineParams
 from connection.models import Engine
@@ -59,19 +54,19 @@ async def create_item(request: EngineIn):
 
 @router.patch("/{id}", response_model=EngineOut)
 async def update_items(id: int, request: EngineIn):
-    item = await get_item(id)
+    item = await crud.get_item_by_pk(id)
     if not item:
         raise HTTPException(status_code=404, detail=f"Item {request.name} not exists")
-    return await update_item(id, request)
+    return await crud.update_item(id, request.dict())
 
 
 @router.delete("/{id}")
 async def delete_items(id: int):
-    item = await get_item(id)
+    item = await crud.get_item_by_pk(id)
     if not item:
         raise HTTPException(status_code=404, detail=f"Item {id} not exists")
-    delete = await delete_item(id)
-    item = await get_item(id)
+    delete = await crud.delete_item(id)
+    item = await crud.get_item_by_pk(id)
     if item:
         raise HTTPException(status_code=404, detail=f"Item {id} was not deleted")
     return {"message": f"Item {id} was deleted"}

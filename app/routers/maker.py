@@ -1,64 +1,72 @@
-from fastapi import APIRouter, HTTPException
-from app.cruds.maker import (
-    get_all_items,
-    get_item_by_id,
-    get_item_by_name,
-    add_item,
-    update_item,
-    delete_item,
-)
-from schemas.maker import MakerOut, MakerIn
+from fastapi import APIRouter, HTTPException, Request
 from app.cruds.CrudOperations import Operations
+from schemas.maker import MakerOut, MakerIn, MakerParams
 from connection.models import Maker
+from typing import List, Optional
 
-router = APIRouter(tags=["makers"], prefix="/maker")
+
+router = APIRouter(tags=["makerOut"], prefix="/maker")
 crud = Operations(Maker)
 
 
 @router.get("/")
-async def get_all():
+async def get_all_makers():
     data = await crud.get_all_items()
     if not data:
-        raise HTTPException(status_code=404, detail="Nothing item was found")
+        raise HTTPException(status_code=404, detail=f"Nothing item was found")
+    return data
+
+
+@router.get("/filter", response_model=List[Optional[MakerOut]])
+async def get_with_filter(request: Request):
+    filters = request.query_params._dict
+    if not filters:
+        raise HTTPException(status_code=404, detail=f"No filters added")
+    filters = MakerParams(**filters)
+    data = await crud.get_items_by_filter(filters.dict())
+    if isinstance(data, ValueError):
+        raise HTTPException(
+            status_code=404, detail=f"Some filter is not inside table columns"
+        )
+    if not data:
+        raise HTTPException(status_code=404, detail=f"Any item was found")
     return data
 
 
 @router.get("/{id}", response_model=MakerOut)
-async def get_item_id(id: int):
-    data = await get_item_by_id(id)
+async def get_all_makers(id: int):
+    data = await crud.get_item_by_pk(id)
     if not data:
         raise HTTPException(status_code=404, detail=f"The id {id} was not found")
     return data
 
 
-## POST
 @router.post("/", response_model=MakerOut)
 async def create_item(request: MakerIn):
-    item = await get_item_by_name(request.name)
+    item = await crud.get_items_by_filter(request.dict())
     if item:
         raise HTTPException(
             status_code=409, detail=f"Item {request.name} already exists"
         )
-    return await add_item(request)
+    created_value = await crud.create_item(request.dict())
+    return created_value
 
 
-## PATCH
 @router.patch("/{id}", response_model=MakerOut)
-async def update_items(id: int, request: MakerIn):
-    data = await get_item_by_id(id)
-    if not data:
+async def update_item(id: int, request: MakerIn):
+    item = await crud.get_item_by_pk(id)
+    if not item:
         raise HTTPException(status_code=404, detail=f"Item {request.name} not exists")
-    return await update_item(id, request)
+    return await crud.update_item(id, request.dict())
 
 
-## DELETE
 @router.delete("/{id}")
-async def delete_item_endpoint(id: int):
-    data = await get_item_by_id(id)
-    if not data:
+async def delete_item(id: int):
+    item = await crud.get_item_by_pk(id)
+    if not item:
         raise HTTPException(status_code=404, detail=f"Item {id} not exists")
-    await delete_item(id)
-    item = await get_item_by_id(id)
+    delete = await crud.delete_item(id)
+    item = await crud.get_item_by_pk(id)
     if item:
         raise HTTPException(status_code=404, detail=f"Item {id} was not deleted")
     return {"message": f"Item {id} was deleted"}

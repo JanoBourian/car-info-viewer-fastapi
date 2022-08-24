@@ -17,14 +17,16 @@ class Crud(Protocol):
     async def get_items_by_filter(self) -> Optional[Record]:
         ...
 
-        # # create item
-        # async def create_item(self):
-        #     ...
+        # create item
 
-        # # update some item (n parameters)
-        # async def update_item(self):
-        #     ...
+    async def create_item(self) -> Optional[Record]:
+        ...
 
-        # # delete item
-        # async def delete_item(self):
+    # update some item (n parameters)
+    async def update_item(self) -> Optional[Record]:
+        ...
+
+        # delete item
+
+    async def delete_item(self) -> Optional[Record]:
         ...

@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class SoldIn(BaseModel):
@@ -11,6 +12,14 @@ class SoldIn(BaseModel):
 class SoldOut(BaseModel):
     id: int
     name: str
+
+    class Config:
+        orm_mode = True
+
+
+class SoldParams(BaseModel):
+    id: Optional[int]
+    name: Optional[str]
 
     class Config:
         orm_mode = True
