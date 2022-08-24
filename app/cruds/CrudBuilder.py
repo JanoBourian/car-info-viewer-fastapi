@@ -1,4 +1,4 @@
-from typing import Protocol, List
+from typing import Protocol, List, Optional
 from databases.interfaces import Record
 from sqlalchemy import Table
 
@@ -8,13 +8,13 @@ class Crud(Protocol):
     async def get_all_items(self, model:Table) -> List[Record]:
         ...
     
-    # # get item by pk
-    # async def get_item_by_pk(self):
-    #     ...
+    # get item by pk
+    async def get_item_by_pk(self) -> Optional[Record]:
+        ...
 
-    # # get item by some filters
-    # async def get_items_by_filter(self):
-    #     ...
+    # get item by some filters
+    async def get_items_by_filter(self) -> Optional[Record]:
+        ...
 
     # # create item
     # async def create_item(self):

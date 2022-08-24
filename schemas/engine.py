@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-
+from typing import Optional
 
 class Engine(BaseModel):
     id: int
@@ -14,5 +14,12 @@ class EngineIn(BaseModel):
 
 
 class EngineOut(Engine):
+    class Config:
+        orm_mode = True
+
+class EngineParams(BaseModel):
+    id: Optional[int]
+    name: Optional[str]
+    
     class Config:
         orm_mode = True
