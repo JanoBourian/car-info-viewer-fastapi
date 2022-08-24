@@ -13,6 +13,7 @@ from typing import List, Optional
 router = APIRouter(tags=["engineOut"], prefix="/engine")
 crud = Operations(Engine)
 
+
 @router.get("/")
 async def get_all_engines():
     data = await crud.get_all_items()
@@ -20,18 +21,22 @@ async def get_all_engines():
         raise HTTPException(status_code=404, detail=f"Nothing item was found")
     return data
 
+
 @router.get("/filter", response_model=List[Optional[EngineOut]])
-async def get_with_filter(request:Request):
+async def get_with_filter(request: Request):
     filters = request.query_params._dict
     if not filters:
         raise HTTPException(status_code=404, detail=f"No filters added")
     filters = EngineParams(**filters)
     data = await crud.get_items_by_filter(filters.dict())
     if isinstance(data, ValueError):
-        raise HTTPException(status_code=404, detail=f"Some filter is not inside table columns")
+        raise HTTPException(
+            status_code=404, detail=f"Some filter is not inside table columns"
+        )
     if not data:
         raise HTTPException(status_code=404, detail=f"Any item was found")
     return data
+
 
 @router.get("/{id}", response_model=EngineOut)
 async def get_all_engines(id: int):
@@ -39,6 +44,7 @@ async def get_all_engines(id: int):
     if not data:
         raise HTTPException(status_code=404, detail=f"The id {id} was not found")
     return data
+
 
 @router.post("/", response_model=EngineOut)
 async def create_item(request: EngineIn):

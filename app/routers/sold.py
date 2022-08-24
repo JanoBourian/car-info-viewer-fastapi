@@ -14,6 +14,7 @@ from connection.models import Sold
 router = APIRouter(tags=["sold"], prefix="/sold")
 crud = Operations(Sold)
 
+
 @router.get("/")
 async def get_all_solds():
     data = await crud.get_all_items()
@@ -22,7 +23,7 @@ async def get_all_solds():
     return data
 
 
-@router.get("/{id}", response_model= SoldOut)
+@router.get("/{id}", response_model=SoldOut)
 async def get_all_solds(id: int):
     data = await get_item(id)
     if not data:
@@ -30,7 +31,7 @@ async def get_all_solds(id: int):
     return data
 
 
-@router.post("/", response_model= SoldOut)
+@router.post("/", response_model=SoldOut)
 async def create_item(request: SoldIn):
     item = await get_item_by_name(request.name)
     if item:
@@ -41,7 +42,7 @@ async def create_item(request: SoldIn):
     return created_value
 
 
-@router.patch("/{id}", response_model= SoldOut)
+@router.patch("/{id}", response_model=SoldOut)
 async def update_items(id: int, request: SoldIn):
     item = await get_item(id)
     if not item:
