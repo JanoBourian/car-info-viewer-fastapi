@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from schemas.engine import EngineOut
+from schemas.engine import Engine, EngineOut
 from schemas.maker import MakerOut
 from schemas.sold import SoldOut
 from datetime import date
@@ -39,7 +39,7 @@ class CarOutExplicit(BaseModel):
     year: date
     price: float
     autonomus: bool
-    engine_id: EngineOut
+    engine_id: Engine
     maker_id: MakerOut
     sold_id: SoldOut
 
