@@ -7,7 +7,7 @@ from typing import List, Optional
 router = APIRouter(tags=["CarOut"], prefix="/car")
 crud = Operations(Car)
 
-@router.get("/")
+@router.get("/", response_model=List[CarOut])
 async def get_all_items():
     data = await crud.get_all_items()
     if not data:
