@@ -14,6 +14,7 @@ List of topics
 * [About configuration inside _schemas/_](#section6)
 * [Entry point in _main.py_](#section7)
 * [Alembic configuration](#section8)
+* [Aditional info][#section9]
 
 <div id="section1"> </div>
 
@@ -275,4 +276,18 @@ alembic upgrade head
 # Delete or change information into models file
 alembic revision --autogenerate -m "Delete Test table"
 alembic upgrade head
+```
+
+<div id="section9"> </div>
+
+# Aditional info
+
+```python
+async def name_function(car: Optional[str] = Query("10", max_length=3)) -> Optional[str]:
+    ...
+```
+
+```python
+async def get_item_by_id(id:int = Path(...)):
+    ...
 ```

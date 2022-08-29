@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Query, Path, status
 from app.cruds.CrudOperations import Operations
 from connection.models import Car
 from schemas.car import CarIn, CarOut, CarParams
@@ -30,7 +30,7 @@ async def get_with_filter(request:Request):
     return data
 
 @router.get("/{id}", response_model = CarOut)
-async def get_item_by_id(id:int):
+async def get_item_by_id(id:int = Path(...)):
     data = await crud.get_item_by_pk(id)
     if not data:
         raise HTTPException(status_code=404, detail=f"The id {id} was not found")
@@ -41,14 +41,20 @@ async def create_item(request: CarIn):
     item = await crud.get_items_by_filter(request.dict())
     if item:
         raise HTTPException(
-            status_code=409, detail=f"Item {request.name} already exists"
+            status_code=status.HTTP_409_CONFLICT, detail=f"Item {request.model} already exists"
+        )
+    info = request.dict()
+    pk_dependency = await crud._check_fk_dependencies(Car, info)
+    if pk_dependency:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=pk_dependency.get("error")
         )
     created_value = await crud.create_item(request.dict())
     return created_value
 
 
 @router.patch("/{id}", response_model=CarOut)
-async def update_item(id: int, request: CarIn):
+async def update_item(request: CarIn, id:int = Path(...)):
     item = await crud.get_item_by_pk(id)
     if not item:
         raise HTTPException(status_code=404, detail=f"Item {request.name} not exists")
@@ -56,7 +62,7 @@ async def update_item(id: int, request: CarIn):
 
 
 @router.delete("/{id}")
-async def delete_item(id: int):
+async def delete_item(id:int = Path(...)):
     item = await crud.get_item_by_pk(id)
     if not item:
         raise HTTPException(status_code=404, detail=f"Item {id} not exists")

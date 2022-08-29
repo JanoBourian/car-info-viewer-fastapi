@@ -1,9 +1,10 @@
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Union
 from databases.interfaces import Record
 from sqlalchemy import Table
 from app.cruds.CrudBuilder import Crud
 from connection.databases import database
 import logging
+import sqlalchemy
 
 
 class Operations(Crud):
@@ -57,3 +58,14 @@ class Operations(Crud):
             if column.primary_key:
                 return column.name
         return ""
+    
+    async def _check_fk_dependencies(self, model: Table, info: dict) -> Union[bool, dict]:
+        for item in model.constraints:
+            if isinstance(item, sqlalchemy.sql.schema.ForeignKeyConstraint):
+                pk = item.referred_table.primary_key.columns._all_columns[0].description
+                id_ = info.get(item._col_description)
+                query = item.referred_table.select().where(item.referred_table.c[pk] == id_)
+                resp = await database.fetch_one(query)
+                if not resp:
+                    return {"error": f"The value of parameter {item._col_description} not exists"}
+        return False
