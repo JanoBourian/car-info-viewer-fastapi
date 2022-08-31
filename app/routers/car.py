@@ -7,6 +7,7 @@ from typing import List, Optional
 router = APIRouter(tags=["CarOut"], prefix="/car")
 crud = Operations(Car)
 
+
 @router.get("/", response_model=List[CarOut])
 async def get_all_items():
     data = await crud.get_all_items()
@@ -14,8 +15,9 @@ async def get_all_items():
         raise HTTPException(status_code=404, detail=f"Nothing item was found")
     return data
 
-@router.get("/filter", response_model = List[Optional[CarOut]])
-async def get_with_filter(request:Request):
+
+@router.get("/filter", response_model=List[Optional[CarOut]])
+async def get_with_filter(request: Request):
     filters = request.query_params._dict
     if not filters:
         raise HTTPException(status_code=404, detail=f"Not filters added")
@@ -29,19 +31,22 @@ async def get_with_filter(request:Request):
         raise HTTPException(status_code=404, detail=f"Any item was found")
     return data
 
-@router.get("/{id}", response_model = CarOut)
-async def get_item_by_id(id:int = Path(...)):
+
+@router.get("/{id}", response_model=CarOut)
+async def get_item_by_id(id: int = Path(...)):
     data = await crud.get_item_by_pk(id)
     if not data:
         raise HTTPException(status_code=404, detail=f"The id {id} was not found")
     return data
+
 
 @router.post("/", response_model=CarOut)
 async def create_item(request: CarIn):
     item = await crud.get_items_by_filter(request.dict())
     if item:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=f"Item {request.model} already exists"
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Item {request.model} already exists",
         )
     info = request.dict()
     pk_dependency = await crud._check_fk_dependencies(Car, info)
@@ -54,7 +59,7 @@ async def create_item(request: CarIn):
 
 
 @router.patch("/{id}", response_model=CarOut)
-async def update_item(request: CarIn, id:int = Path(...)):
+async def update_item(request: CarIn, id: int = Path(...)):
     item = await crud.get_item_by_pk(id)
     if not item:
         raise HTTPException(status_code=404, detail=f"Item {request.name} not exists")
@@ -62,7 +67,7 @@ async def update_item(request: CarIn, id:int = Path(...)):
 
 
 @router.delete("/{id}")
-async def delete_item(id:int = Path(...)):
+async def delete_item(id: int = Path(...)):
     item = await crud.get_item_by_pk(id)
     if not item:
         raise HTTPException(status_code=404, detail=f"Item {id} not exists")
