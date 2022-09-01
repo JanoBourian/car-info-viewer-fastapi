@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, status
 from app.cruds.CrudOperations import Operations
 from schemas.engine import EngineOut, EngineIn, EngineParams
 from connection.models import Engine
@@ -66,6 +66,8 @@ async def delete_items(id: int):
     if not item:
         raise HTTPException(status_code=404, detail=f"Item {id} not exists")
     delete = await crud.delete_item(id)
+    if delete: 
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = f"ERROR: {delete}")
     item = await crud.get_item_by_pk(id)
     if item:
         raise HTTPException(status_code=404, detail=f"Item {id} was not deleted")

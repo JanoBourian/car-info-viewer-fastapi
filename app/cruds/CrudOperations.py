@@ -50,8 +50,11 @@ class Operations(Crud):
     async def delete_item(self, pk: Any) -> Optional[Record]:
         id_ = self._get_pk()
         query = self.model.delete().where(self.model.c[id_] == pk)
-        await database.execute(query)
-        return await self.get_item_by_pk(pk)
+        try:
+            await database.execute(query)
+        except Exception as e:
+            logging.warning(f"ERROR: {e}")
+            return e
 
     def _get_pk(self) -> str:
         for column in self.model.columns:

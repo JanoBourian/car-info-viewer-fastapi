@@ -8,15 +8,15 @@ router = APIRouter(tags=["CarOut"], prefix="/car")
 crud = Operations(Car)
 
 
-@router.get("/", response_model=List[CarOut])
+@router.get("/", response_model=List[CarOut], status_code = status.HTTP_200_OK)
 async def get_all_items():
     data = await crud.get_all_items()
     if not data:
-        raise HTTPException(status_code=404, detail=f"Nothing item was found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Nothing item was found")
     return data
 
 
-@router.get("/filter", response_model=List[Optional[CarOut]])
+@router.get("/filter", response_model=List[Optional[CarOut]], status_code = status.HTTP_200_OK)
 async def get_with_filter(request: Request):
     filters = request.query_params._dict
     if not filters:
@@ -25,22 +25,22 @@ async def get_with_filter(request: Request):
     data = await crud.get_items_by_filter(filters.dict())
     if isinstance(data, ValueError):
         raise HTTPException(
-            status_code=404, detail=f"Some filter is not inside table columns"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Some filter is not inside table columns"
         )
     if not data:
-        raise HTTPException(status_code=404, detail=f"Any item was found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Any item was found")
     return data
 
 
-@router.get("/{id}", response_model=CarOut)
+@router.get("/{id}", response_model=CarOut, status_code = status.HTTP_200_OK)
 async def get_item_by_id(id: int = Path(...)):
     data = await crud.get_item_by_pk(id)
     if not data:
-        raise HTTPException(status_code=404, detail=f"The id {id} was not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"The id {id} was not found")
     return data
 
 
-@router.post("/", response_model=CarOut)
+@router.post("/", response_model=CarOut, status_code = status.HTTP_201_CREATED)
 async def create_item(request: CarIn):
     item = await crud.get_items_by_filter(request.dict())
     if item:
@@ -58,21 +58,23 @@ async def create_item(request: CarIn):
     return created_value
 
 
-@router.patch("/{id}", response_model=CarOut)
+@router.patch("/{id}", response_model=CarOut, status_code = status.HTTP_200_OK)
 async def update_item(request: CarIn, id: int = Path(...)):
     item = await crud.get_item_by_pk(id)
     if not item:
-        raise HTTPException(status_code=404, detail=f"Item {request.name} not exists")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Item {request.name} not exists")
     return await crud.update_item(id, request.dict())
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", status_code = status.HTTP_200_OK)
 async def delete_item(id: int = Path(...)):
     item = await crud.get_item_by_pk(id)
     if not item:
-        raise HTTPException(status_code=404, detail=f"Item {id} not exists")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Item {id} not exists")
     delete = await crud.delete_item(id)
+    if delete: 
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = f"ERROR: {delete}")
     item = await crud.get_item_by_pk(id)
     if item:
-        raise HTTPException(status_code=404, detail=f"Item {id} was not deleted")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Item {id} was not deleted")
     return {"message": f"Item {id} was deleted"}
