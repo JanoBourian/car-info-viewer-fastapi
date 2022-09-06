@@ -285,6 +285,8 @@ alembic upgrade head
 ```python
 async def name_function(car: Optional[str] = Query("10", max_length=3)) -> Optional[str]:
     ...
+
+from fastapi.encoders import jsonable_encoder(new) # By json responses
 ```
 
 ```python
